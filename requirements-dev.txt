@@ -1,0 +1,13 @@
+-r requirements.txt
+flake8
+pytest
+coverage
+pytest-coverage
+black
+
+# Socket.io server
+aiohttp
+
+# Mypy
+mypy
+types-setuptools
