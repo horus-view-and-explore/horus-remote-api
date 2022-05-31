@@ -18,6 +18,7 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
+import inspect
 from random import randint
 
 
@@ -42,6 +43,22 @@ class Connection:
         self._address = address
         self._on_event_func = on_event_func
 
+        # Callback can accept 1 or 2 arguments. First argument is the
+        # event data and the second argument is the request data.
+        if on_event_func:
+            pc = _get_param_count(on_event_func)
+            if pc == 1:
+                self._on_event_func = self._wrap_on_event_func(on_event_func)
+            elif pc == 2:
+                self._on_event_func = on_event_func
+            else:
+                raise TypeError("on_event_func must have 1..=2 parameters")
+
+    def _wrap_on_event_func(self, f):
+        def wrapper(event, request):
+            return f(event)
+        return wrapper
+
     def connect(self):
         raise NotImplementedError
 
@@ -56,3 +73,7 @@ class Connection:
 
     def next_id(self):
         return randint(0x1, 0xFFFF)
+
+
+def _get_param_count(f):
+    return len(inspect.signature(f).parameters)

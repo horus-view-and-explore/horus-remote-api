@@ -99,7 +99,7 @@ class SocketIOConnection(Connection):
     def _on_ctrl_event(self, data):
         if self._on_event_func:
             for event in data["Events"]:
-                self._on_event_func(AttrDict(event))
+                self._on_event_func(AttrDict(event), AttrDict(data.get("Request", {})))
 
     def _wait(self, future, timeout, err_msg):
         try:
